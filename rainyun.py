@@ -457,13 +457,28 @@ if __name__ == "__main__":
         results.append(result)
         logger.info(f"=== 第 {i} 个账户处理完成 ===\n")
     
+    # 生成统一通知
     success_count = sum(1 for r in results if r[0])
-    notification_content = f"雨云自动签到结果：成功 {success_count}/{len(results)}\n"
-    for r in results:
-        status = "✅" if r[0] else "❌"
-        notification_content += f"{status} {r[1]}: {r[2]}分\n"
-        if not r[0]: notification_content += f"   Error: {r[3]}\n"
-            
+    total_count = len(results)
+    
+    if success_count == total_count:
+        notification_title = f"✅ 雨云自动签到完成 - 全部成功"
+    elif success_count > 0:
+        notification_title = f"⚠️ 雨云自动签到完成 - 部分成功 ({success_count}/{total_count})"
+    else:
+        notification_title = f"❌ 雨云自动签到完成 - 全部失败"
+    
+    notification_content = f"雨云自动签到结果汇总：\n\n总账户数: {total_count}\n成功账户数: {success_count}\n失败账户数: {total_count - success_count}\n\n详细结果：\n"
+    
+    for i, (success, user, points, error_msg) in enumerate(results, 1):
+        if success:
+            notification_content += f"{i}. ✅ {user}\n   积分: {points} | 约 {points / 2000:.2f} 元\n"
+        else:
+            notification_content += f"{i}. ❌ {user}\n   错误: {error_msg}\n"
+    
+    # 发送统一通知
     try:
-        send("雨云签到通知", notification_content)
-    except: pass
+        send(notification_title, notification_content)
+        logger.info("统一通知发送成功")
+    except Exception as e:
+        logger.error(f"发送通知失败: {e}")
