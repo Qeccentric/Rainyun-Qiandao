@@ -377,19 +377,19 @@ def sign_in_account(user, pwd, debug=False, headless=False):
                         
                         # --- 核心修复：点击后等待，确保验证码 iframe 有时间加载 ---
                         logger.info("等待验证码加载（如果有）...")
-                        time.sleep(10) 
                         
                         try:
-                            logger.info("检查是否需要验证码")
+                            WebDriverWait(driver, 15, poll_frequency=0.25).until(
+                                EC.visibility_of_element_located((By.ID, "tcaptcha_iframe_dy"))
+                            )
                             wait.until(EC.frame_to_be_available_and_switch_to_it((By.ID, "tcaptcha_iframe_dy")))
                             logger.info("处理验证码")
                             process_captcha()
                             driver.switch_to.default_content()
                         except TimeoutException:
-                            logger.info("未触发验证码")
+                            logger.info("未触发验证码，继续")
                             driver.switch_to.default_content()
                         except Exception as e:
-                            # 捕获其他错误，防止因 ocr 变量未定义等原因直接退出
                             logger.error(f"验证码处理过程出错: {e}")
                             driver.switch_to.default_content()
                         
