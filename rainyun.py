@@ -46,7 +46,7 @@ except ImportError:
     def send(*args, **kwargs):
         pass
 
-AD_URL = "https://scfc.dpdns.org/ad.json"
+AD_URL = os.environ.get("AD_URL", "https://scfc.dpdns.org/ad.json")
 
 AD_TEXT = None
 AD_LINK = None
@@ -81,7 +81,7 @@ def fetch_remote_ad():
                 LATEST_VERSION = ad_data["latest_version"]
             
             if "update_url" in ad_data:
-                UPDATE_URL = ad_data["update_url"]
+                UPDATE_URL = ad_data["update_url"].strip().strip('`').strip("'").strip('"')
             
             if "ads" in ad_data and isinstance(ad_data["ads"], list):
                 AD_LIST = ad_data["ads"]
