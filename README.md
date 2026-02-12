@@ -2,7 +2,7 @@
 
 ![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/scfcn/Rainyun-Qiandao/rainyun-sign.yml?style=flat-square)
 ![Python Version](https://img.shields.io/badge/python-3.9+-blue.svg?style=flat-square)
-![License](https://img.shields.io/badge/license-MIT-green.svg?style=flat-square)
+![License](https://img.shields.io/badge/license-GPL%20v3.0-green.svg?style=flat-square)
 ![GitHub Stars](https://img.shields.io/github/stars/scfcn/Rainyun-Qiandao?style=flat-square)
 ![GitHub Forks](https://img.shields.io/github/forks/scfcn/Rainyun-Qiandao?style=flat-square)
 
