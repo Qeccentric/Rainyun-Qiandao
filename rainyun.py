@@ -107,6 +107,36 @@ def auto_update(current_ver):
     print(f"🔄 开始自动更新到 v{LATEST_VERSION}...")
     
     try:
+        import subprocess
+        import shutil
+        
+        git_path = shutil.which('git')
+        if not git_path:
+            print("⚠️ 未找到 git，尝试直接下载...")
+            download_update()
+            return
+        
+        print(f"📥 正在使用 git 同步最新版本...")
+        
+        subprocess.run(['git', 'fetch', '--all'], check=True, capture_output=True, text=True)
+        subprocess.run(['git', 'reset', '--hard', 'origin/main'], check=True, capture_output=True, text=True)
+        
+        print(f"✅ 更新完成！已同步到 v{LATEST_VERSION}")
+        print(f"📝 请重新运行脚本以使用新版本")
+        exit(0)
+    except subprocess.CalledProcessError as e:
+        print(f"❌ git 同步失败: {e}")
+        print(f"📥 尝试直接下载...")
+        download_update()
+    except Exception as e:
+        print(f"❌ 自动更新失败: {e}")
+        if UPDATE_URL:
+            print(f"📥 请手动更新: {UPDATE_URL}")
+
+
+def download_update():
+    global LATEST_VERSION, UPDATE_URL
+    try:
         import urllib3
         urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
         
@@ -130,7 +160,7 @@ def auto_update(current_ver):
             if UPDATE_URL:
                 print(f"📥 请手动更新: {UPDATE_URL}")
     except Exception as e:
-        print(f"❌ 自动更新失败: {e}")
+        print(f"❌ 下载失败: {e}")
         if UPDATE_URL:
             print(f"📥 请手动更新: {UPDATE_URL}")
 
