@@ -36,6 +36,24 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y google-chrome-stable curl unzip
+          sudo apt-get install -y \
+            libx11-6 \
+            libxcomposite1 \
+            libxcursor1 \
+            libxdamage1 \
+            libxext6 \
+            libxi6 \
+            libxtst6 \
+            libnss3 \
+            libcups2 \
+            libxss1 \
+            libxrandr2 \
+            libasound2 \
+            libpangocairo-1.0-0 \
+            libatk1.0-0 \
+            libatk-bridge2.0-0 \
+            libgtk-3-0 \
+            libgdk-pixbuf2.0-0
           # 使用webdriver-manager自动管理ChromeDriver版本
           pip install webdriver-manager chromedriver-binary-auto
       

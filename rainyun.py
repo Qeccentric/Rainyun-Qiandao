@@ -50,7 +50,10 @@ except ImportError:
 def init_selenium(debug=False, headless=False) -> WebDriver:
     ops = Options()
     if headless or os.environ.get("GITHUB_ACTIONS", "false") == "true":
-        for option in ['--headless', '--no-sandbox', '--disable-dev-shm-usage', '--disable-gpu']:
+        for option in ['--headless=new', '--no-sandbox', '--disable-dev-shm-usage', '--disable-gpu',
+                       '--disable-extensions', '--disable-software-rasterizer',
+                       '--remote-debugging-port=9222', '--disable-background-timer-throttling',
+                       '--disable-backgrounding-occluded-windows', '--disable-renderer-backgrounding']:
             ops.add_argument(option)
     ops.add_argument('--window-size=1920,1080')
     ops.add_argument('--disable-blink-features=AutomationControlled')
