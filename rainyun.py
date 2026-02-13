@@ -342,8 +342,13 @@ def sign_in_account(user, pwd, debug=False, headless=False):
         password.send_keys(pwd)
         logger.info("已输入密码")
         time.sleep(0.5)
-        driver.execute_script("arguments[0].click();", login_button)
-        logger.info("已点击登录按钮")
+        
+        try:
+            login_button.click()
+            logger.info("已点击登录按钮 (click方法)")
+        except:
+            driver.execute_script("arguments[0].click();", login_button)
+            logger.info("已点击登录按钮 (executeScript方法)")
         
         try:
             wait.until(EC.visibility_of_element_located((By.ID, 'tcaptcha_iframe_dy')))
@@ -354,11 +359,31 @@ def sign_in_account(user, pwd, debug=False, headless=False):
             logger.info("未触发验证码")
             pass
         
-        time.sleep(5)
+        logger.info("等待页面跳转...")
+        time.sleep(10)
         driver.switch_to.default_content()
         
         current_url = driver.current_url
         logger.info(f"当前URL: {current_url}")
+        
+        try:
+            driver.save_screenshot("login_debug.png")
+            logger.info("已保存页面截图: login_debug.png")
+            try:
+                import base64
+                with open("login_debug.png", "rb") as f:
+                    img_base64 = base64.b64encode(f.read()).decode()
+                    logger.info(f"页面截图Base64 (前100字符): {img_base64[:100]}...")
+            except Exception as e:
+                logger.error(f"Base64转换失败: {e}")
+        except Exception as e:
+            logger.error(f"截图失败: {e}")
+        
+        try:
+            error_msg = driver.find_element(By.CSS_SELECTOR, '.error-message, .error, [class*="error"]')
+            logger.error(f"页面错误信息: {error_msg.text}")
+        except:
+            logger.info("未检测到错误信息")
         
         if "dashboard" in current_url or ("app.rainyun.com" in current_url and "login" not in current_url):
             logger.info("登录成功")
