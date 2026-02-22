@@ -8,7 +8,9 @@
 
 ## Star 历史
 
-[![Star History Chart](https://api.star-history.com/svg?repos=scfcn/Rainyun-Qiandao&type=Date)](https://star-history.com/#scfcn/Rainyun-Qiandao&Date)
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=scfcn/Rainyun-Qiandao&type=date&legend=top-left)](https://www.star-history.com/#scfcn/Rainyun-Qiandao&type=date&legend=top-left)
 
 ## 项目概述
 

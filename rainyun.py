@@ -72,6 +72,7 @@ def save_cookies(driver, username):
 def load_cookies(driver, username):
     cookie_file = get_cookie_file(username)
     if not os.path.exists(cookie_file):
+        logger.info(f"未找到Cookie缓存文件，将使用账号密码登录")
         return False
     try:
         with open(cookie_file, "r", encoding="utf-8") as f:
@@ -86,10 +87,11 @@ def load_cookies(driver, username):
         driver.refresh()
         time.sleep(3)
         if "dashboard" in driver.current_url or "auth" not in driver.current_url:
-            logger.info(f"Cookie加载成功，已登录")
+            logger.info(f"Cookie登录成功")
             return True
     except Exception as e:
         logger.warning(f"加载Cookie失败: {e}")
+    logger.info("Cookie已过期，将使用账号密码登录")
     return False
 
 
@@ -119,6 +121,17 @@ def init_selenium(debug=False, headless=False):
     if debug and not is_github_actions:
         ops.add_experimental_option("detach", True)
     
+    driver = None
+    
+    try:
+        if os.path.exists("chromedriver.exe"):
+            print("尝试使用本地chromedriver.exe")
+            service = Service("./chromedriver.exe", log_path=subprocess.DEVNULL)
+            driver = webdriver.Chrome(service=service, options=ops)
+            return driver
+    except Exception as e:
+        print(f"使用本地chromedriver.exe失败: {e}")
+
     try:
         if ChromeDriverManager:
             if ChromeType and hasattr(ChromeType, 'GOOGLE'):
@@ -126,20 +139,28 @@ def init_selenium(debug=False, headless=False):
             else:
                 manager = ChromeDriverManager()
             driver_path = manager.install()
-            service = Service(driver_path)
+            service = Service(driver_path, log_path=subprocess.DEVNULL)
             driver = webdriver.Chrome(service=service, options=ops)
             return driver
     except Exception as e:
         print(f"webdriver-manager失败: {e}")
 
-    # 备用方案
     try:
         driver = webdriver.Chrome(options=ops)
         return driver
-    except Exception:
-        pass
+    except Exception as e:
+        print(f"webdriver.Chrome直接创建失败: {e}")
+
+    try:
+        import chromedriver_binary
+        driver_path = chromedriver_binary.chromedriver_path()
+        service = Service(driver_path, log_path=subprocess.DEVNULL)
+        driver = webdriver.Chrome(service=service, options=ops)
+        return driver
+    except Exception as e:
+        print(f"使用chromedriver_binary失败: {e}")
         
-    raise Exception("无法初始化Selenium WebDriver")
+    raise Exception("无法初始化Selenium WebDriver，请检查Chrome浏览器和ChromeDriver是否正确安装")
 
 def download_image(url, filename):
     os.makedirs("temp", exist_ok=True)
@@ -360,21 +381,18 @@ def sign_in_account(user, pwd, debug=False, headless=False):
         use_cookie = os.environ.get("USE_COOKIE", "true").lower() == "true"
         
         if use_cookie:
-            logger.info("尝试使用Cookie免密登录")
             driver.get("https://app.rainyun.com")
             if load_cookies(driver, user):
                 if "dashboard" in driver.current_url:
-                    logger.info("Cookie登录成功！")
+                    logger.info("Cookie登录成功")
                 else:
                     driver.get("https://app.rainyun.com")
                     time.sleep(3)
                     if "auth" in driver.current_url:
-                        logger.info("Cookie已过期，需要重新登录")
+                        logger.info("Cookie已过期，将使用账号密码登录")
                         use_cookie = False
             else:
-                logger.info("Cookie不可用或已过期，需要重新登录")
                 use_cookie = False
-                driver.get("https://app.rainyun.com/auth/login")
         else:
             driver.get("https://app.rainyun.com/auth/login")
         
