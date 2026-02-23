@@ -541,6 +541,14 @@ def sign_in_account(user, pwd, debug=False, headless=False):
                                 driver.switch_to.default_content()
                                 
                             logger.info("领取奖励操作完成")
+                            # === 新补上的“下班指令” ===
+                            try:
+                                points_raw = driver.find_element(By.XPATH, '//*[@id="app"]/div[1]/div[3]/div[2]/div/div/div[2]/div[1]/div[1]/div/p/div/h3').get_attribute("textContent")
+                                current_points = int(''.join(re.findall(r'\d+', points_raw)))
+                            except:
+                                current_points = 0
+                            return True, user, current_points, None
+                            # ==========================
                             
                         else:
                             logger.info("✅ 未找到【领取奖励】按钮，‘每日签到’已完成，跳过。")
