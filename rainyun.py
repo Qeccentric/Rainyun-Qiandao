@@ -492,7 +492,7 @@ def sign_in_account(user, pwd, debug=False, headless=False):
         driver = init_selenium(debug=debug, headless=headless, fingerprint=fingerprint)
         
         globals()['driver'] = driver 
-        
+        wait = WebDriverWait(driver, timeout) # <--- 增加这一行，提前初始化 wait
         try:
             with open("stealth.min.js", mode="r") as f: js = f.read()
             driver.execute_cdp_cmd("Page.addScriptToEvaluateOnNewDocument", {"source": js})
